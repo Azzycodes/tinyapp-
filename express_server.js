@@ -1,5 +1,7 @@
 const express = require("express");
+const cookieParser = require('cookie-parser')
 const app = express();
+app.use(cookieParser());
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -21,7 +23,8 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { urls: urlDatabase, username: req.cookies["username"]};
+  res.render("urls_new", templateVars);
 });
 
 app.get("/", (req, res) => {
@@ -29,7 +32,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
@@ -59,6 +62,12 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
+});
+
+
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username)
+  res.redirect(`/urls`)
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
