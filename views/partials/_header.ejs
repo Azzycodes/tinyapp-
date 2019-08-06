@@ -8,9 +8,21 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+         
+        <% console.log(username)%>
+  
+        
+        <% if (username) { %>
+          <form method= "POST" action ="/logout" style = "position: absolute; right: 0">
+            Logged in As:  <%= username %>
+            <button type="submit" class="btn btn-outline-dark">Logout</button>
+          </form>
+       <% } else { %>
+
         <form  method= "POST" action = "/login" style = "position: absolute; right: 0">
           <input  type="text" placeholder=" Username" name="username" required minlength="3" maxlength="10" size="20" >
           <button type="submit" class="btn btn-outline-dark">Login</button>
+          <% } %>
   
           </form>
       </div>
