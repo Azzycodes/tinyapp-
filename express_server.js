@@ -42,6 +42,11 @@ const users = {
     id: "user2RandomID", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  },
+  "test1": {
+    id: "test1",
+    email: "a@a",
+    password: "aaa"
   }
 };
 
@@ -101,7 +106,7 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
   if (email === "" || password === "") {
     res.status(400).send("Please enter email and password"); 
-  } else if (findUser(email, users)) {
+  } else if (findUser(email, user)) {
     res.status(400).send("Already registered email!");
   } else {
 
@@ -119,16 +124,20 @@ app.post("/register", (req, res) => {
 }});
 
 app.post("/login", (req, res) => {
-  // TODO: only set cookie if user exists
-  res.cookie("user_id", req.body.username)
-  res.redirect(`/urls`)
+  const { email, password } = req.body;
+  let user = findUser(email, users)
+  if (user && user.password === password) {
+    res.cookie("user_id, users.id");
+    res.redirect('/urls');
+  } else {
+    res.status(403).send("Incorrect email and password");
+  }
 });
-
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id")
   res.redirect('/urls')
-})
+});
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
