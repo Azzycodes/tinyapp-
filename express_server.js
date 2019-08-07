@@ -50,8 +50,12 @@ const users = {
 };
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]]};
-  res.render("urls_new", templateVars);
+  if (req.cookies.user_id) {
+    let templateVars = {user: users[req.cookies["user_id"]]};
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/register", (req, res) => {
@@ -72,7 +76,6 @@ app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]] };
   res.render("urls_index", templateVars);
 });
-
 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
