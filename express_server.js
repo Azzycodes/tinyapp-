@@ -93,7 +93,7 @@ app.post("/register", (req, res) => {
   let registerPassword = req.body.password;
   if (registerEmail === "" || registerPassword === "") {
     console.log("no data")
-    res.send(404) 
+    res.send(400) 
   }
 
   let newUser = generateRandomString();
