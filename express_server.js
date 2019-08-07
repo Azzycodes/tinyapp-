@@ -21,12 +21,11 @@ function generateRandomString() {
 const findUser = function(email, database) {
   for (let user in database) {
     if (database[user].email === email) {
-      return database[user].id
+      return user
     }
-  }
+  }  
   return undefined;
 };
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -126,7 +125,10 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   let user = findUser(email, users)
-  if (user && user.password === password) {
+  console.log(user, password)
+  console.log(users)
+  if (users[user].email && users[user].password === password) {
+  
     res.cookie("user_id, users.id");
     res.redirect('/urls');
   } else {
