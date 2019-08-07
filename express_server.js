@@ -129,7 +129,7 @@ app.post("/login", (req, res) => {
   console.log(users)
   if (users[user].email && users[user].password === password) {
   
-    res.cookie("user_id, users.id");
+    res.cookie("user_id", users[user].id);
     res.redirect('/urls');
   } else {
     res.status(403).send("Incorrect email and password");
