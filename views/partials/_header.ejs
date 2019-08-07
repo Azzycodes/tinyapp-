@@ -16,10 +16,11 @@
             <button type="submit" class="btn btn-outline-dark">Logout</button>
           </form>
        <% } else { %>
+          <div style="position: absolute; right: 0">
+          <a href="/login"><input type = "submit" class="btn btn-primary" style="background-color: green" value = "Login"></a>
+          <a href="/register"><input type="submit" class="btn btn-primary" style="background-color: green" value="Register"></a>
+          </div>
 
-        <form  method= "POST" action = "/login" style = "position: absolute; right: 0">
-          <input  type="text" placeholder=" Username" name="username" required minlength="3"  size="20" >
-          <button type="submit" class="btn btn-outline-dark">Login</button>
           <% } %>
   
           </form>
