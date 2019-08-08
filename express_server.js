@@ -91,17 +91,11 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL].longURL) {
-  let templateVars = { user: users[req.cookies["user_id"]], shortURL:
-  req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
+  let templateVars = { user: users[req.cookies["user_id"]], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
   res.render("urls_show", templateVars);
   } else {
     res.status(404)
   }});
-
-  //should work?
-  // urlDatabase[req.params.shortURL].longURL = req.body.newURL;
-  // res.redirect("/urls")
-
 
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
@@ -129,11 +123,20 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortString}`);
 });
 
+app.post("/urls/:shortURL", (req, res) => {
+  if (users[req.cookies["user_id"]] && (req.cookies["user_id"])) {
+    urlDatabase[req.params.shortURL].longURL = req.body.newURL;
+    res.redirect("/urls")
+} else {
+  res.status(401).send("Must log in to edit URL")
+}
+});
+ 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   if (email === "" || password === "") {
     res.status(400).send("Please enter email and password"); 
-  } else if (findUser(email, user)) {
+  } else if (findUser(email, users)) {
     res.status(400).send("Already registered email!");
   } else {
 
