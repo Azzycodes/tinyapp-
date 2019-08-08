@@ -62,7 +62,7 @@ const users = {
 };
 
 app.get("/urls/new", (req, res) => {
-  if (req.cookies.user_id) {
+  if (users[req.cookies["user_id"]]) {
     let templateVars = {user: users[req.cookies["user_id"]]};
     res.render("urls_new", templateVars);
   } else {
