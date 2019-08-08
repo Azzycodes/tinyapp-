@@ -79,13 +79,21 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  if (urlDatabase[req.params.shortURL]) {
+  let templateVars = { user: users[req.cookies["user_id"]], shortURL:
+  req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
   res.render("urls_show", templateVars);
-});
+  } else {
+    res.status(404)
+  }});
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  if (urlDatabase[req.params.shortURL]) {
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
+  } else {
+    res.status(404);
+  }
 });
 
 app.get("/urls.json", (req, res) => {
