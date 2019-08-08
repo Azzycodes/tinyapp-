@@ -27,8 +27,9 @@ const findUser = function(email, database) {
   return undefined;
 };
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
+  "test01": {longURL: "http://youtube.com", userID: "test1"}
 };
 
 const users = { 
@@ -128,8 +129,6 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   let user = findUser(email, users)
-  console.log(user, password)
-  console.log(users)
   if (users[user].email && users[user].password === password) {
   
     res.cookie("user_id", users[user].id);
