@@ -26,6 +26,17 @@ const findUser = function(email, database) {
   }  
   return undefined;
 };
+
+const urlsForUser = function(id) {
+  let output = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[url].userID === userID) {
+      output[key] = urlDatabase[url].longURL;
+    }
+  }
+  return output;
+};
+
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" },
@@ -62,12 +73,12 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_register", templateVars);
-})
+});
 
 app.get("/login", (req, res) => {
   let templateVars = {user: users[req.cookies["user_id"]]};
   res.render("urls_login", templateVars)
-})
+});
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -79,13 +90,18 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
+  if (urlDatabase[req.params.shortURL].longURL) {
   let templateVars = { user: users[req.cookies["user_id"]], shortURL:
   req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
   res.render("urls_show", templateVars);
   } else {
     res.status(404)
   }});
+
+  //should work?
+  // urlDatabase[req.params.shortURL].longURL = req.body.newURL;
+  // res.redirect("/urls")
+
 
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
@@ -107,10 +123,10 @@ app.get("/hello", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   res.statusCode = 200;
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  let shortString = generateRandomString();
+  urlDatabase[shortString] = { longURL: req.body.longURL, userID: req.cookies["user_id"] };
   console.log(urlDatabase);
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${shortString}`);
 });
 
 app.post("/register", (req, res) => {
