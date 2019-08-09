@@ -1,6 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const { findUser, urlsForUser, generateRandomString } = require ("./helpers");
+const { findUser, urlsForUser, generateRandomString } = require("./helpers");
 const cookieSession = require('cookie-session');
 const app = express();
 
@@ -38,12 +38,17 @@ const users = {
   }
 };
 
+app.get("/", (req, res) => {
+  let templateVars = {user: users[req.session.user_id]};
+  if (templateVars.user) {
+    res.render("urls_new", templateVars);
+  } else res.redirect("/login");
+});
+
 app.get("/urls/new", (req, res) => {
   if (users[req.session.user_id]) {
     let templateVars = {user: users[req.session.user_id]};
     res.render("urls_new", templateVars);
-  } else {
-    res.redirect("/login");
   }
 });
 
@@ -57,29 +62,28 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
-app.get("/", (req, res) => {
-  let templateVars = {user: users[req.session.user_id]};
-  if (templateVars.user) {
-    res.render("urls_new", templateVars);
-  } else res.redirect("/login");
-});
-
 app.get("/urls", (req, res) => {
-  if(!req.session["user_id"]) {
-    res.status(400).send("Please log in to edit URLs");
+  if (!req.session["user_id"]) {
+    res.status(400).send("Error: Please log in");
   } else {
-  let urlsOfUser = urlsForUser(req.session.user_id, urlDatabase);
-  let templateVars = { urls: urlsOfUser, user: users[req.session.user_id] };
-  res.render("urls_index", templateVars);
-}
+    let urlsOfUser = urlsForUser(req.session.user_id, urlDatabase);
+    let templateVars = { urls: urlsOfUser, user: users[req.session.user_id] };
+    res.render("urls_index", templateVars);
+  }
 });
 
+//Display page for created URLs for users - sends errors for not logged in users
 app.get("/urls/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL].longURL) {
-    let templateVars = { user: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
-    res.render("urls_show", templateVars);
+  if (!req.session["user_id"]) {
+    res.status(400).send("Please log in to edit");
+  } else if (!urlDatabase[req.params["shortURL"]]) {
+    res.status(400).send("Error: URL does not exist");
   } else {
-    res.status(404).send("Please Log in");  }
+    if ((urlDatabase[req.params.shortURL]).longURL) {
+      let templateVars = { user: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
+      res.render("urls_show", templateVars);
+    }
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -99,6 +103,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// ShortURL and longURL are added to the URLdatabase
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   res.statusCode = 200;
