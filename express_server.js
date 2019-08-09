@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const { findUser, urlsForUser, generateRandomString } = require ("./helpers");
 const cookieSession = require('cookie-session');
 const app = express();
 
@@ -12,26 +13,6 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
-function generateRandomString() {
-  let randomString = "";
-  const randomChars = "0123456789qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM";
-  for (let i = 0; i < 6; i++) {
-    randomString += randomChars[Math.floor(Math.random() * Math.floor(randomChars.length))];
-  
-  }
-
-  return randomString;
-};
-
-const findUser = function(email, database) {
-  for (let user in database) {
-    if (database[user].email === email) {
-      return user;
-    }
-  }
-  return undefined;
-};
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
@@ -57,17 +38,6 @@ const users = {
   }
 };
 
-const urlsForUser = function(userID) {
-  let output = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === userID) {
-      output[key] = urlDatabase[key].longURL;
-    }
-  }
-  return output;
-};
-
-
 app.get("/urls/new", (req, res) => {
   if (users[req.session.user_id]) {
     let templateVars = {user: users[req.session.user_id]};
@@ -88,13 +58,20 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  let templateVars = {user: users[req.session.user_id]};
+  if (templateVars.user) {
+    res.render("urls_new", templateVars);
+  } else res.redirect("/login");
 });
 
 app.get("/urls", (req, res) => {
-  let urlsOfUser = urlsForUser(req.session.user_id);
+  if(!req.session["user_id"]) {
+    res.status(400).send("Please log in to edit URLs");
+  } else {
+  let urlsOfUser = urlsForUser(req.session.user_id, urlDatabase);
   let templateVars = { urls: urlsOfUser, user: users[req.session.user_id] };
   res.render("urls_index", templateVars);
+}
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -102,8 +79,7 @@ app.get("/urls/:shortURL", (req, res) => {
     let templateVars = { user: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
     res.render("urls_show", templateVars);
   } else {
-    res.status(404);
-  }
+    res.status(404).send("Please Log in");  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -189,3 +165,4 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
