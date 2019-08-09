@@ -62,6 +62,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 
+//Homepage that shows both short and long URLs for users and error message for non users
 app.get("/urls", (req, res) => {
   if (!req.session["user_id"]) {
     res.status(400).send("Error: Please log in");
@@ -121,7 +122,8 @@ app.post("/urls/:shortURL", (req, res) => {
     res.status(401).send("Must log in to edit URL");
   }
 });
- 
+
+//registers if email and password input fields are filled, shows errors if filled incorrectly
 app.post("/register", (req, res) => {
   let { email, password } = req.body;
   if (email === "" || password === "") {
